@@ -1,3 +1,4 @@
+(* interface do dominio *)
 signature DOMINIO =
   sig
     (* tipos opacos *)
@@ -12,15 +13,15 @@ signature DOMINIO =
 
     (* tipos transparentes *)
     type comando =
-        int * int -> estado -> estado * estado -> estado
+        int * (int -> estado -> (estado * estado) -> estado)
     datatype id =
         Id of string
     datatype valor =
-        Booleano of bool
-      | Cadeia of string
-      | NomeEstado of nomeestado
-      | Comando of comando
-      | Processo of processo
+        VBooleano of bool
+      | VCadeia of string
+      | VNomeEstado of nomeestado
+      | VComando of comando
+      | VProcesso of processo
 
 		(* nomeestado *)
     val inicializado : nomeestado
@@ -71,4 +72,135 @@ signature DOMINIO =
     val obterGrupoProcessos : estado -> grupoprocessos
     val atualizarGrupoProcessos : estado -> grupoprocessos -> estado
     val registrar : estado -> string -> estado
+  end
+
+(* implementacao do dominio *)
+structure Dominio :> DOMINIO =
+  struct
+    datatype nomeestado = 
+        Inicializado
+      | Executando
+      | Finalizado
+      | Suspenso
+
+    and processo =
+        Processo of string * int
+      | SubOrquestrador of comando * int
+
+    and ambiente =
+        AmbienteVazio
+      | Ambiente of ((id * valor) list * ambiente)
+
+    and id =
+        Id of string
+
+    and valor =
+        VBooleano of bool
+      | VCadeia of string
+      | VNomeEstado of nomeestado
+      | VComando of comando
+      | VProcesso of processo
+
+    and grupoprocessos = 
+        GrupoProcessos of (processo * nomeestado) list
+
+    and dependencias = 
+        Dependencias of (processo * processo) list
+
+    and filaeventos =
+        FilaEventos of (processo * nomeestado * comando) list
+
+    and filaevusuario =
+        FilaEvUsuario of (processo * string * comando) list
+ 
+    and estado =
+        Estado of {
+          resultado      : valor,
+          ambiente       : ambiente,
+          dependencias   : dependencias,
+          eventos        : filaeventos,
+          eventosUsuario : filaevusuario,
+          processos      : grupoprocessos,
+          mensagens      : string list
+        }
+
+    withtype comando = int * (int -> estado -> (estado * estado) -> estado)
+
+
+		(* nomeestado *)
+    val inicializado = Inicializado
+    val executando = Executando
+    val suspenso = Suspenso
+    val finalizado = Finalizado
+
+		(* processo *)
+    fun novoProcesso nome pid =
+      Processo (nome, pid)
+    fun novoSubOrquestrador comando pid =
+      SubOrquestrador (comando, pid)
+
+    (* grupo processos *)
+    val grupoProcessoVazio = GrupoProcessos []
+    fun alterarProcessoGrupo grupoprocessos processo nomeestado =
+      raise Match
+    
+
+    (* dependencias *)
+    val dependenciasVazia = Dependencias []
+    fun criarDependencia dependencias dependent dependency =
+      raise Match
+    fun removerDependencia dependencias dependent dependency =
+      raise Match
+
+    (* filaeventos *)
+    val filaEventosVazia  = FilaEventos []
+    fun criarEscutadorEvento filaeventos processo nomeestado comando = 
+      raise Match
+    fun removerEscutadorEvento filaeventos processo =
+      raise Match
+
+    (* filaevusuario *)
+    val filaEvUsuarioVazia = FilaEvUsuario []
+    fun criaEscutadorEvUsuario filaevusuario processo string comando =
+      raise Match
+    fun removerEscutadorEvUsuario filaevusuario processo =
+      raise Match
+
+    (* ambiente *)
+    val ambienteInicial = AmbienteVazio
+    fun extenderAmbiente ambiente id valor =
+      raise Match
+    fun obterSimboloAmbiente ambiente id valor =
+      raise Match
+    fun empilharAmbiente ambiente =
+      raise Match
+
+    (* estado *)
+    fun obterAmbiente estado =
+      raise Match
+    fun atualizarAmbiente estado ambiente =
+      raise Match
+    fun obterResultado estado =
+      raise Match
+    fun atualizarResultado estado valor =
+      raise Match
+    fun obterDependencias estado =
+      raise Match
+    fun atualizarDependencias estado dependencias =
+      raise Match
+    fun obterEventos estado =
+      raise Match
+    fun atualizarEventos estado filaeventos =
+      raise Match
+    fun obterEventosUsuario estado =
+      raise Match 
+    fun atualizarEventosUsuario estado =
+      raise Match
+    fun obterGrupoProcessos estado =
+      raise Match
+    fun atualizarGrupoProcessos estado grupoprocessos =
+      raise Match
+    fun registrar estado string =
+      raise Match
+
   end
