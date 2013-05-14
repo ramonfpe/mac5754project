@@ -1,85 +1,74 @@
-type comando = int * int -> estado -> estado * estado -> estado
-
-signature NOMEESTADO =
+signature DOMINIO =
   sig
+    (* tipos opacos *)
     type nomeestado
+    type processo
+    type grupoprocessos
+    type dependencias
+    type filaeventos
+    type filaevusuario
+    type ambiente
+    type estado
+
+    (* tipos transparentes *)
+    type comando =
+        int * int -> estado -> estado * estado -> estado
+    datatype id =
+        Id of string
+    datatype valor =
+        Booleano of bool
+      | Cadeia of string
+      | NomeEstado of nomeestado
+      | Comando of comando
+      | Processo of processo
+
+		(* nomeestado *)
     val inicializado : nomeestado
     val executando : nomeestado
     val suspenso : nomeestado
     val finalizado : nomeestado
-  end
 
-signature PROCESSO =
-  sig
-    type processo
+		(* processo *)
     val novoProcesso : string -> int -> processo
     val novoSubOrquestrador : comando -> int -> processo
-  end
 
-signature GRUPOPROCESSOS =
-  sig
-    type grupoprocessos
-    val alterarProcessoGrupo : grupoprocessos -> Processo.processo -> NOMEESTADO.nomeestado -> grupoprocessos
+    (* grupo processos *)
+    val alterarProcessoGrupo : grupoprocessos -> processo -> nomeestado -> grupoprocessos
     val grupoProcessoVazio : grupoprocessos
-  end
 
-signature DEPENDENCIAS =
-  sig
-    type dependencias
+    (* dependencias *)
     val dependenciasVazia : dependencias
-    val criarDependencia : dependencias -> PROCESSO.processo -> PROCESSO.processo -> dependencias
-    val removerDependencia : dependencias -> PROCESSO.processo -> PROCESSO.processo -> dependencias
-  end
+    val criarDependencia : dependencias -> processo -> processo -> dependencias
+    val removerDependencia : dependencias -> processo -> processo -> dependencias
 
-signature FILAEVENTOS =
-  sig
-    type filaeventos
+    (* filaeventos *)
     val filaEventosVazia : filaeventos
-    val criarEscutadorEvento : filaeventos -> PROCESSO.processo -> NOMEESTADO.nomeestado -> comando -> filaeventos
-    val removerEscutadorEvento : filaeventos -> PROCESSO.processo -> filaeventos
-  end
+    val criarEscutadorEvento : filaeventos -> processo -> nomeestado -> comando -> filaeventos
+    val removerEscutadorEvento : filaeventos -> processo -> filaeventos
 
-signature FILAEVUSUARIO =
-  sig
-    type filaevusuario
+    (* filaevusuario *)
     val filaEvUsuarioVazia : filaevusuario
-    val criaEscutadorEvUsuario : filaevusuario -> PROCESSO.processo -> string -> comando -> filaevusuario
-    val removerEscutadorEvUsuario : filaevusuario -> PROCESSO.processo -> filaevusuario
-  end
+    val criaEscutadorEvUsuario : filaevusuario -> processo -> string -> comando -> filaevusuario
+    val removerEscutadorEvUsuario : filaevusuario -> processo -> filaevusuario
 
-signature AMBIENTE = 
-  sig
-    type ambiente
+    (* ambiente *)
     val ambienteInicial : ambiente
     val extenderAmbiente : ambiente -> id -> valor -> ambiente
     val obterSimboloAmbiente : ambiente -> id -> valor -> ambiente
     val empilharAmbiente : ambiente -> ambiente
-  end
 
-signature ESTADO =
-  sig
-    type estado
-    val obterAmbiente : estado -> AMBIENTE.ambiente
-    val atualizarAmbiente : estado -> AMBIENTE.ambiente -> estado
+    (* estado *)
+    val obterAmbiente : estado -> ambiente
+    val atualizarAmbiente : estado -> ambiente -> estado
     val obterResultado : estado -> valor
     val atualizarResultado : estado -> valor -> estado
-    val obterDependencias : estado -> DEPENDENCIAS.dependencias
-    val atualizarDependencias : estado -> DEPENDENCIAS.dependencias -> estado
-    val obterEventos : estado -> FILAEVENTOS.filaeventos
-    val atualizarEventos : estado -> FILAEVENTOS.filaeventos -> estado
-    val obterEventosUsuario : estado -> FILAEVUSUARIO.filaevusuario
-    val atualizarEventosUsuario : estado -> FILAEVUSUARIO.filaevusuario
-    val obterGrupoProcessos :
-    val atualizarGrupoProcessos :
-    val registrar :
+    val obterDependencias : estado -> dependencias
+    val atualizarDependencias : estado -> dependencias -> estado
+    val obterEventos : estado -> filaeventos
+    val atualizarEventos : estado -> filaeventos -> estado
+    val obterEventosUsuario : estado -> filaevusuario
+    val atualizarEventosUsuario : estado -> filaevusuario
+    val obterGrupoProcessos : estado -> grupoprocessos
+    val atualizarGrupoProcessos : estado -> grupoprocessos -> estado
+    val registrar : estado -> string -> estado
   end
-
-datatype valor =
-  Booleano of bool
-| Cadeia of string
-| NOMEESTADO of NOMEESTADO.nomeestado
-| Comando of comando
-| Processo of PROCESSO.processo
-
-datatype id = Id of string
-
