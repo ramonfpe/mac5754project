@@ -45,7 +45,7 @@ signature DOMINIO =
     (* filaeventos *)
     val filaEventosVazia : filaeventos
     val criarEscutadorEvento : filaeventos -> processo -> nomeestado -> comando -> filaeventos
-    val removerEscutadorEvento : filaeventos -> processo -> filaeventos
+    val removerEscutadorEvento : filaeventos -> processo -> nomeestado -> filaeventos
 
     (* filaevusuario *)
     val filaEvUsuarioVazia : filaevusuario
@@ -133,31 +133,60 @@ structure Dominio :> DOMINIO =
     val suspenso = Suspenso
     val finalizado = Finalizado
 
-		(* processo *)
+    (* processo *)
     fun novoProcesso nome pid =
       Processo (nome, pid)
     fun novoSubOrquestrador comando pid =
       SubOrquestrador (comando, pid)
+    fun equals (Processo (_, pid1)) (Processo (_, pid2)) = pid1 = pid2
+      | equals (SubOrquestrador (_, pid1)) (SubOrquestrador (_, pid2)) = pid1 = pid2
+      | equals (_:processo) (_:processo) = false
+    fun notEquals (p:processo) (q:processo) = not (equals p q)
 
     (* grupo processos *)
     val grupoProcessoVazio = GrupoProcessos []
-    fun alterarProcessoGrupo grupoprocessos processo nomeestado =
-      raise Match
+    fun alterarProcessoGrupo (GrupoProcessos l) processo nomeestado =
+      let
+        fun isNotProcesso (p, _) = notEquals p processo
+        val l2 = List.filter isNotProcesso l
+        val l3 = (processo, nomeestado) :: l2
+      in
+        GrupoProcessos l3
+      end
     
 
     (* dependencias *)
     val dependenciasVazia = Dependencias []
-    fun criarDependencia dependencias dependent dependency =
-      raise Match
-    fun removerDependencia dependencias dependent dependency =
-      raise Match
+    fun criarDependencia (Dependencias l) dependent dependency =
+      Dependencias ((dependent, dependency) :: l)
+    fun removerDependencia (Dependencias l) dependent dependency =
+      let
+        fun isNotDep (dt, dy) =
+          (notEquals dt dependent) orelse (notEquals dy dependency)
+        val l2 = List.filter isNotDep l 
+      in 
+        Dependencias l2
+      end
 
     (* filaeventos *)
     val filaEventosVazia  = FilaEventos []
     fun criarEscutadorEvento filaeventos processo nomeestado comando = 
-      raise Match
-    fun removerEscutadorEvento filaeventos processo =
-      raise Match
+      let
+        val (FilaEventos l2) =
+          removerEscutadorEvento filaeventos processo nomeestado
+        val l3 = (processo, nomeestado, comando) :: l2
+      in
+        FilaEventos l3
+      end
+    and removerEscutadorEvento (FilaEventos l) processo nomeestado =
+      let
+        fun isNotEscutador (p, ne, _) =
+          ne <> nomeestado andalso (notEquals p processo)
+        val l2 = List.filter isNotEscutador l
+      in
+        FilaEventos l2
+      end
+      
 
     (* filaevusuario *)
     val filaEvUsuarioVazia = FilaEvUsuario []
