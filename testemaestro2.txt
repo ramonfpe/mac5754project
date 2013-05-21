@@ -1,0 +1,1 @@
+sub fn1($X,$Y){se verdadeiro {$variavel := $xpto}}
