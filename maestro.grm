@@ -1,0 +1,105 @@
+(* Sample interactive calculator for ML-Yacc *)
+
+fun lookup "bogus" = 10000
+  | lookup s = 0
+
+%%
+
+%eop EOF SEMI
+
+(* %pos declares the type of positions for terminals.
+   Each symbol has an associated left and right position. *)
+
+%pos int
+
+%left SUB PLUS
+%left TIMES DIV
+%right CARAT
+
+%term ID of string | NUM of int | PLUS | TIMES | PRINT 
+  | SEMI | EOF | CARAT | DIV | SUB 
+	| EST_INI |EST_SUS | EST_EXE | EST_FIN 
+	| BOOL_V | BOOL_F | FLUX_SE | FLUX_REP 
+	| FLUX_RET | SUB2 | VIRGULA | ATRIB 
+	| COLCH_E | COLCH_D | PAREN_E | PAREN_D 
+	| CHAVE_E | CHAVE_D 
+	|ID2 of string | CADEIA of string 
+
+%nonterm EXP of int | MAESTRO of int option 
+	|EXPR of int option| CALL of int option
+	|LIST_EXPR of int option|CMD of	int option
+	|BLOCO of	int option
+	|LIST_CMD of	int option
+	|SUB_DEF of	int option
+	|LIST_PARAM_DEF of	int option
+
+%name Maestro
+
+%subst PRINT for ID
+%prefer PLUS TIMES DIV SUB
+%keyword PRINT SEMI
+
+%noshift EOF
+%value ID ("bogus")
+%verbose
+%%
+
+(* the parser returns the value associated with the expression *)
+
+  MAESTRO : PRINT EXP (print (Int.toString EXP);
+                     print "\n";
+                     SOME EXP)
+
+	| SUB_DEF MAESTRO (NONE)
+  	| SUB_DEF EXP (print ("entrou na subdef\n"); SOME EXP)
+	| EXPR EXP (print ("entrou na expresao\n"); SOME EXP)
+	| BLOCO EXP (print ("entrou no comando\n"); SOME EXP)
+        | EXP (SOME EXP)
+	|	(NONE)
+
+
+  SUB_DEF	: SUB2 ID2 PAREN_E LIST_PARAM_DEF PAREN_D BLOCO	(NONE) (*TO DO*)
+
+  LIST_PARAM_DEF: ID2 VIRGULA LIST_PARAM_DEF	(NONE) (*TO DO*)
+		| ID2				(NONE) (*TO DO*)
+		| 				(NONE)
+
+  BLOCO		: CHAVE_E LIST_CMD CHAVE_D	(NONE) (*TO DO*)
+
+  LIST_CMD	: CMD LIST_CMD	(NONE) (*TO DO*)
+		| 		(NONE)
+
+  CMD		: FLUX_SE EXPR BLOCO	(NONE) (*TO DO*)
+		| FLUX_REP NUM BLOCO	(NONE) (*TO DO*)
+		| ID2 ATRIB CALL	(NONE) (*TO DO*)
+		| CALL			(NONE) (*TO DO*)
+		| FLUX_RET EXPR SEMI	(NONE) (*TO DO*)
+		
+  CALL	:ID2 LIST_EXPR(NONE) (*TO DO*)
+
+  LIST_EXPR : EXPR LIST_EXPR	(NONE) (*TO DO*)
+	| 			(NONE)
+
+  EXPR	: EST_INI EXP (print "inicial\n";SOME EXP)
+	| EST_SUS EXP (print ("suspenso\n"); SOME EXP )
+	| EST_EXE EXP (print ("exec\n"); SOME EXP )
+	| EST_FIN EXP (print ("fin\n"); SOME EXP )
+	| CADEIA EXP (print ("cadeia\n");print (CADEIA);print ("\n"); SOME EXP )
+	| COLCH_E CALL COLCH_D EXP (print ("[");print ("entrou no CALL");print ("]");
+					print ("\n"); SOME EXP )
+	| BOOL_V EXP (print ("verdadeiro\n"); SOME EXP )
+	| BOOL_F EXP (print ("falso\n"); SOME EXP )
+
+	| ID2 EXP (print ("id2\n");print (ID2);print ("\n"); SOME EXP )
+        | (NONE)
+
+  EXP : NUM             (NUM)
+      | ID              (lookup ID)
+      | EXP PLUS EXP    (EXP1+EXP2)
+      | EXP TIMES EXP   (EXP1*EXP2)
+      | EXP DIV EXP     (EXP1 div EXP2)
+      | EXP SUB EXP     (EXP1-EXP2)
+      | EXP CARAT EXP   (let fun e (m,0) = 1
+                                | e (m,l) = m*e(m,l-1)
+                         in e (EXP1,EXP2)
+                         end)
