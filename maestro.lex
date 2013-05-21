@@ -17,18 +17,14 @@ digit=[0-9];
 ws = [\ \t];
 %%
 
-"$"(_|[A-Za-z])(_|[0-9]|[A-Za-z])* => (Tokens.ID2(yytext,!pos,!pos));
+"$"(_|[0-9]|[A-Za-z])* => (Tokens.VAR(yytext,!pos,!pos));
 
 "\""([^"\""])*"\"" => (Tokens.CADEIA(yytext,!pos,!pos));
 
 \n       => (pos := (!pos) + 1; lex());
 {ws}+    => (lex());
 
-"+"      => (Tokens.PLUS(!pos,!pos));
-"*"      => (Tokens.TIMES(!pos,!pos));
-"-"      => (Tokens.SUB(!pos,!pos));
-"^"      => (Tokens.CARAT(!pos,!pos));
-"/"      => (Tokens.DIV(!pos,!pos));
+
 
 ";"      => (Tokens.SEMI(!pos,!pos));
 ","		=> (Tokens.VIRGULA(!pos,!pos));
@@ -51,10 +47,7 @@ ws = [\ \t];
 "sub"		=> (Tokens.SUB2(!pos,!pos));
 
 {digit}+ => (Tokens.NUM (valOf (Int.fromString yytext), !pos, !pos));
-{alpha}+ => (if yytext="print"
-                 then Tokens.PRINT(!pos,!pos)
-                 else Tokens.ID(yytext,!pos,!pos)
-            );
+(_|[A-Za-z])(_|[0-9]|[A-Za-z])* => (Tokens.ID(yytext,!pos,!pos));
 
 "."      => (error ("ignoring bad character "^yytext,!pos,!pos);
              lex());
