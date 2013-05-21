@@ -1,2 +1,2 @@
 CM.make "sources.cm";
-Maestro.keybd();
+Maestro.parse "testemaestro2.txt";
