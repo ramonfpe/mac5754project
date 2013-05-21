@@ -51,11 +51,12 @@
 
   CMD		: FLUX_SE EXPR BLOCO	(print "CMD FLUX_SE\n")
 		| FLUX_REP NUM BLOCO	(print "CMD FLUX_REP\n")
-		| VAR ATRIB CALL	(print "CMD ATRIB\n")
+		| VAR ATRIB CALL 	(print "CMD ATRIB CALL\n")
+		| VAR ATRIB VAR	SEMI	(print "CMD ATRIB VAR\n")
 		| CALL			(print "CMD CALL\n")
 		| FLUX_RET EXPR SEMI	(print "CMD FLUX_RET\n")
 		
-  CALL	:VAR LIST_EXPR (print "CALL \n")
+  CALL	:ID LIST_EXPR SEMI(print "CALL \n")
 
   LIST_EXPR : EXPR LIST_EXPR	(print "LIST_EXPR \n")
 	| 			(print "LIST_EXPR VAZIO \n")
