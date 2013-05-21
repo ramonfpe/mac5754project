@@ -23,13 +23,13 @@ signature DOMINIO =
       | VComando of comando
       | VProcesso of processo
 
-		(* nomeestado *)
+    (* nomeestado *)
     val inicializado : nomeestado
     val executando : nomeestado
     val suspenso : nomeestado
     val finalizado : nomeestado
 
-		(* processo *)
+    (* processo *)
     val novoProcesso : string -> int -> processo
     val novoSubOrquestrador : comando -> int -> processo
 
@@ -50,13 +50,13 @@ signature DOMINIO =
     (* filaevusuario *)
     val filaEvUsuarioVazia : filaevusuario
     val criaEscutadorEvUsuario : filaevusuario -> processo -> string -> comando -> filaevusuario
-    val removerEscutadorEvUsuario : filaevusuario -> processo -> filaevusuario
+    val removerEscutadorEvUsuario : filaevusuario -> processo -> string -> filaevusuario
 
     (* ambiente *)
+    exception NaoEncontrado of id
     val ambienteInicial : ambiente
     val extenderAmbiente : ambiente -> id -> valor -> ambiente
-    val obterSimboloAmbiente : ambiente -> id -> valor -> ambiente
-    val empilharAmbiente : ambiente -> ambiente
+    val obterSimboloAmbiente : ambiente -> id -> valor
 
     (* estado *)
     val obterAmbiente : estado -> ambiente
@@ -68,7 +68,7 @@ signature DOMINIO =
     val obterEventos : estado -> filaeventos
     val atualizarEventos : estado -> filaeventos -> estado
     val obterEventosUsuario : estado -> filaevusuario
-    val atualizarEventosUsuario : estado -> filaevusuario
+    val atualizarEventosUsuario : estado -> filaevusuario -> estado
     val obterGrupoProcessos : estado -> grupoprocessos
     val atualizarGrupoProcessos : estado -> grupoprocessos -> estado
     val registrar : estado -> string -> estado
@@ -89,7 +89,7 @@ structure Dominio :> DOMINIO =
 
     and ambiente =
         AmbienteVazio
-      | Ambiente of ((id * valor) list * ambiente)
+      | Ambiente of ((id * valor) * ambiente)
 
     and id =
         Id of string
@@ -127,7 +127,7 @@ structure Dominio :> DOMINIO =
     withtype comando = int * (int -> estado -> (estado * estado) -> estado)
 
 
-		(* nomeestado *)
+    (* nomeestado *)
     val inicializado = Inicializado
     val executando = Executando
     val suspenso = Suspenso
@@ -172,11 +172,11 @@ structure Dominio :> DOMINIO =
     val filaEventosVazia  = FilaEventos []
     fun criarEscutadorEvento filaeventos processo nomeestado comando = 
       let
-        val (FilaEventos l2) =
+        val (FilaEventos l) =
           removerEscutadorEvento filaeventos processo nomeestado
-        val l3 = (processo, nomeestado, comando) :: l2
+        val l2 = (processo, nomeestado, comando) :: l
       in
-        FilaEventos l3
+        FilaEventos l2
       end
     and removerEscutadorEvento (FilaEventos l) processo nomeestado =
       let
@@ -191,45 +191,188 @@ structure Dominio :> DOMINIO =
     (* filaevusuario *)
     val filaEvUsuarioVazia = FilaEvUsuario []
     fun criaEscutadorEvUsuario filaevusuario processo string comando =
-      raise Match
-    fun removerEscutadorEvUsuario filaevusuario processo =
-      raise Match
+      let
+        val (FilaEvUsuario l) =
+          removerEscutadorEvUsuario filaevusuario processo string
+        val l2 = (processo, string, comando) :: l
+      in
+        FilaEvUsuario l2
+      end
+    and removerEscutadorEvUsuario (FilaEvUsuario l) processo string =
+      let
+        fun isNotEvUsuario (p, s, _) =
+          (notEquals p processo) orelse (s = string)
+        val l2 = List.filter isNotEvUsuario l
+      in
+        FilaEvUsuario l2
+      end
 
     (* ambiente *)
+    exception NaoEncontrado of id
     val ambienteInicial = AmbienteVazio
     fun extenderAmbiente ambiente id valor =
-      raise Match
-    fun obterSimboloAmbiente ambiente id valor =
-      raise Match
-    fun empilharAmbiente ambiente =
-      raise Match
+      Ambiente ((id, valor), ambiente)
+    fun obterSimboloAmbiente AmbienteVazio id = 
+          raise (NaoEncontrado id)
+      | obterSimboloAmbiente (Ambiente ((eid, v), next)) tid =
+          if eid = tid then v else (obterSimboloAmbiente next tid)
 
     (* estado *)
-    fun obterAmbiente estado =
-      raise Match
-    fun atualizarAmbiente estado ambiente =
-      raise Match
-    fun obterResultado estado =
-      raise Match
-    fun atualizarResultado estado valor =
-      raise Match
-    fun obterDependencias estado =
-      raise Match
-    fun atualizarDependencias estado dependencias =
-      raise Match
-    fun obterEventos estado =
-      raise Match
-    fun atualizarEventos estado filaeventos =
-      raise Match
-    fun obterEventosUsuario estado =
-      raise Match 
-    fun atualizarEventosUsuario estado =
-      raise Match
-    fun obterGrupoProcessos estado =
-      raise Match
-    fun atualizarGrupoProcessos estado grupoprocessos =
-      raise Match
-    fun registrar estado string =
-      raise Match
+    fun obterAmbiente (Estado s) =
+      #ambiente s
+    fun atualizarAmbiente (Estado s) ambiente =
+      let
+        val ({
+          resultado=rs,
+          ambiente=_, 
+          dependencias=deps, 
+          eventos=evs,
+          eventosUsuario=evus,
+          processos=ps, mensagens=msgs
+        }) = s
+      in
+        Estado {
+          resultado=rs,
+          ambiente=ambiente,
+          dependencias=deps,
+          eventos=evs,
+          eventosUsuario=evus,
+          processos=ps,
+          mensagens=msgs
+        }
+      end
+    fun obterResultado (Estado s) = #resultado s
+    fun atualizarResultado (Estado s) valor =
+      let
+        val ({
+          resultado=_,
+          ambiente=ambiente, 
+          dependencias=deps, 
+          eventos=evs,
+          eventosUsuario=evus,
+          processos=ps, mensagens=msgs
+        }) = s
+      in
+        Estado {
+          resultado=valor,
+          ambiente=ambiente,
+          dependencias=deps,
+          eventos=evs,
+          eventosUsuario=evus,
+          processos=ps,
+          mensagens=msgs
+        }
+      end      
+    fun obterDependencias (Estado s) = #dependencias s
+    fun atualizarDependencias (Estado s) dependencias =
+      let
+        val ({
+          resultado=rs,
+          ambiente=ambiente, 
+          dependencias=_, 
+          eventos=evs,
+          eventosUsuario=evus,
+          processos=ps, mensagens=msgs
+        }) = s
+      in
+        Estado {
+          resultado=rs,
+          ambiente=ambiente,
+          dependencias=dependencias,
+          eventos=evs,
+          eventosUsuario=evus,
+          processos=ps,
+          mensagens=msgs
+        }
+      end
+    fun obterEventos (Estado s) = #eventos s
+    fun atualizarEventos (Estado s) filaeventos =
+      let
+        val ({
+          resultado=rs,
+          ambiente=ambiente, 
+          dependencias=deps, 
+          eventos=_,
+          eventosUsuario=evus,
+          processos=ps, mensagens=msgs
+        }) = s
+      in
+        Estado {
+          resultado=rs,
+          ambiente=ambiente,
+          dependencias=deps,
+          eventos=filaeventos,
+          eventosUsuario=evus,
+          processos=ps,
+          mensagens=msgs
+        }
+      end
+    fun obterEventosUsuario (Estado s) = #eventosUsuario s 
+    fun atualizarEventosUsuario (Estado s) evus =
+      let
+        val ({
+          resultado=rs,
+          ambiente=ambiente, 
+          dependencias=deps, 
+          eventos=evs,
+          eventosUsuario=_,
+          processos=ps, mensagens=msgs
+        }) = s
+      in
+        Estado {
+          resultado=rs,
+          ambiente=ambiente,
+          dependencias=deps,
+          eventos=evs,
+          eventosUsuario=evus,
+          processos=ps,
+          mensagens=msgs
+        }
+      end
+    fun obterGrupoProcessos (Estado s) = #processos s 
+    fun atualizarGrupoProcessos (Estado s) grupoprocessos =
+      let
+        val ({
+          resultado=rs,
+          ambiente=ambiente, 
+          dependencias=deps, 
+          eventos=evs,
+          eventosUsuario=evus,
+          processos=_, 
+          mensagens=msgs
+        }) = s
+      in
+        Estado {
+          resultado=rs,
+          ambiente=ambiente,
+          dependencias=deps,
+          eventos=evs,
+          eventosUsuario=evus,
+          processos=grupoprocessos,
+          mensagens=msgs
+        }
+      end      
+    fun registrar (Estado s) string =
+      let
+        val ({
+          resultado=rs,
+          ambiente=ambiente, 
+          dependencias=deps, 
+          eventos=evs,
+          eventosUsuario=evus,
+          processos=ps, 
+          mensagens=msgs
+        }) = s
+      in
+        Estado {
+          resultado=rs,
+          ambiente=ambiente,
+          dependencias=deps,
+          eventos=evs,
+          eventosUsuario=evus,
+          processos=ps,
+          mensagens=(string :: msgs)
+        }
+      end      
 
   end
