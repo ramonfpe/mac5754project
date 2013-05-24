@@ -1,8 +1,6 @@
 %%
 %eop EOF SEMI
 
-(* %pos declares the type of positions for terminals. Each symbol has an associated left and right position. *)
-
 %pos int
 %term 
 	ID of string 
@@ -22,17 +20,15 @@
 	|BLOCO
 	|LIST_CMD	
 	|CMD 
-	|CALL 
+	|CALL of Dominio.valor
 	|LIST_EXPR 
-	|EXPR 
+	|EXPR of Dominio.valor
 
 %name Maestro
 
 %noshift EOF
 %verbose
 %%
-
-(* the parser returns the value associated with the expression *)
 
   MAESTRO : SUB_DEF MAESTRO (print "SUB_DEF MAESTRO\n")
 	  |	(print "MAESTRO VAZIO\n")
@@ -55,20 +51,18 @@
 		| VAR ATRIB VAR	SEMI	(print "CMD ATRIB VAR\n")
 		| CALL			(print "CMD CALL\n")
 		| FLUX_RET EXPR SEMI	(print "CMD FLUX_RET\n")
-		
-  CALL	:ID LIST_EXPR SEMI(print "CALL \n")
+		| FLUX_RET SEMI	(print "CMD FLUX_RET\n")
+
+  CALL	:ID LIST_EXPR SEMI (Dominio.VNomeEstado Dominio.inicializado) (*TO DO*)
 
   LIST_EXPR : EXPR LIST_EXPR	(print "LIST_EXPR \n")
 	| 			(print "LIST_EXPR VAZIO \n")
 
-  EXPR	: EST_INI  (print "inicial\n")
-	| EST_SUS  (print ("suspenso\n") )
-	| EST_EXE  (print ("exec\n") )
-	| EST_FIN  (print ("fin\n") )
-	| CADEIA  (print ("cadeia\n");print (CADEIA);print ("\n") )
-	| COLCH_E CALL COLCH_D  (print ("[");print ("entrou no CALL");print ("]");
-					print ("\n") )
-	| BOOL_V  (print ("verdadeiro\n") )
-	| BOOL_F  (print ("falso\n") )
-
-        | (print "EXPR VAZIO\n")
+  EXPR	: EST_INI  (Dominio.VNomeEstado Dominio.inicializado)
+	| EST_SUS  (Dominio.VNomeEstado Dominio.suspenso)
+	| EST_EXE  (Dominio.VNomeEstado Dominio.executando)
+	| EST_FIN  (Dominio.VNomeEstado Dominio.finalizado)
+	| CADEIA   (Dominio.VCadeia CADEIA)
+	| COLCH_E CALL COLCH_D (CALL)
+	| BOOL_V   (Dominio.VBooleano true)
+	| BOOL_F   (Dominio.VBooleano false)
