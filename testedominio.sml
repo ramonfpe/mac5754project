@@ -13,57 +13,53 @@ val dpen : Dominio.dependencias = Dominio.dependenciasVazia;
 val filev  : Dominio.filaeventos = Dominio.filaEventosVazia;
 val filus : Dominio.filaevusuario = Dominio.filaEvUsuarioVazia;
 val amb  : Dominio.ambiente = Dominio.ambienteInicial;
+val est  : Dominio.estado = Dominio.estadoInicial;
 
-
-(*
-val est  : Dominio.estado = 
-Estado 
-(
-    {
-      resultado = (Dominio.VNomeEstado Dominio.inicializado)
-      ,ambiente = amb
-      ,dependencias = dpen
-      ,eventos = filev
-      ,eventosUsuario = filus
-      ,processos = gpro
-      ,mensagens = ["oi","oi2"]
-    }
-);
-    
-*)
 
 print "\n\tTestando Tipos Transparentes:\n\n";
 
 val testeid : Dominio.id = Dominio.Id "variavel x";
+
+val comdVazio : Dominio.comando 
+= (1,
+fn ( x: int) 
+      => fn (m1:Dominio.estado) 
+	    => fn (n1:Dominio.estado, n2:Dominio.estado) => n1
+);
+
 val valorBool : Dominio.valor = Dominio.VBooleano true;
 val valorBool = Dominio.VBooleano false;
       
 val valorcad : Dominio.valor = Dominio.VCadeia ("oi sou caracteres");
 val valornomestado : Dominio.valor = Dominio.VNomeEstado Dominio.inicializado;
 val valorproce : Dominio.valor = Dominio.VProcesso ((Dominio.novoProcesso( "novo1" )) (1));
-
-(*  
-    type comando =
-        int * (int -> estado -> (estado * estado) -> estado)
-val valorcom : Dominio.valor = Dominio.VComando of comando
-
-*)
+val valorcom : Dominio.valor = Dominio.VComando 
+(
+    (1,
+    fn ( x: int) 
+	      => fn (m1:Dominio.estado) 
+		=> fn (n1:Dominio.estado, n2:Dominio.estado) => n1
+    )
+);
 
 print "\n\tTestando Funcoes de Processo:\n\n";
 
-val mapeaProcesso = Dominio.novoProcesso( "novo1" );
-val processoX = mapeaProcesso(3);
-
+val processoX : Dominio.processo = Dominio.novoProcesso "processoX" 3;
 val gpro  : Dominio.grupoprocessos = Dominio.grupoProcessoVazio;
+val gpro2  : Dominio.grupoprocessos = Dominio.alterarProcessoGrupo gpro processoX Dominio.inicializado;
+val processoSubOrquestador : Dominio.processo = 
+  Dominio.novoSubOrquestrador comdVazio 7;
 (*
 val funcao
     (* grupo processos *)
-    val alterarProcessoGrupo : grupoprocessos -> processo -> nomeestado -> grupoprocessos
+
+
+ 
 
 
 (*  *)
     (* processo *)
-    val novoSubOrquestrador : comando -> int -> processo
+
 
 
 print "\n\tTestando Funcoes de Dependencia:\n\n";
@@ -138,3 +134,7 @@ datatype carro = Carro of
 
 val meucarro2 : carro = Carro( {color="silver",make="Toyota",model="Corolla",year=1986} );
 *)
+
+print "\n\tBrincando com Funcoes:\n\n";
+
+fun prim(n1:int, n2:int) : int = n1
