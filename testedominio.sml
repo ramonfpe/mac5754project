@@ -93,6 +93,38 @@ print "\n\tTestando Funcoes de Ambiente:\n\n";
 
 print "\n\tTestando Funcoes de Estado :\n\n";
 
+val estadoInicial = (Dominio.estadoInicial);
+print "\n";
+val ambienteObtido = Dominio.obterAmbiente( estadoInicial );
+val funcAtualizaAmbiente = Dominio.atualizarAmbiente (estadoInicial);
+val estadoAtualizado = funcAtualizaAmbiente(ambienteObtido);
+print "\n";
+val resultadoObtido = Dominio.obterResultado(estadoAtualizado);
+val funcAtualizaResultado = Dominio.atualizarResultado (estadoInicial);
+val estadoAtualizado = funcAtualizaResultado(Dominio.VCadeia("resultado"));
+val resultadoObtido = Dominio.obterResultado(estadoAtualizado);
+print "\n";
+val dependenciasObtidas = Dominio.obterDependencias(estadoAtualizado);
+val funcAtualizaDependencias = Dominio.atualizarDependencias (estadoInicial);
+val estadoAtualizado = funcAtualizaDependencias(dependenciasObtidas);
+print "\n";
+val eventosObtidos = Dominio.obterEventos(estadoAtualizado);
+val funcAtualizaEventos = Dominio.atualizarEventos (estadoInicial);
+val estadoAtualizado = funcAtualizaEventos(eventosObtidos);
+print "\n";
+val eventosObtidosUsuario = Dominio.obterEventosUsuario(estadoAtualizado);
+val funcAtualizaEventosUsuario = Dominio.atualizarEventosUsuario (estadoInicial);
+val estadoAtualizado = funcAtualizaEventosUsuario(eventosObtidosUsuario);
+print "\n";
+val grupoProcessosObtidos = Dominio.obterGrupoProcessos(estadoAtualizado);
+val funcAtualizaGrupoProcessos = Dominio.atualizarGrupoProcessos (estadoInicial);
+val estadoAtualizado = funcAtualizaGrupoProcessos(grupoProcessosObtidos);
+print "\n";
+val funcAtualizaRegistros = Dominio.registrar(estadoAtualizado);
+val estadoAtualizado = funcAtualizaRegistros("teste");
+print estadoAtualizado.mensagens;
+print "\n";
+
     (*Marcio : estado *)
     val obterAmbiente : estado -> ambiente
     val atualizarAmbiente : estado -> ambiente -> estado
