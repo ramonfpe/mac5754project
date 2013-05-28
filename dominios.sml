@@ -59,6 +59,7 @@ signature DOMINIO =
     val obterSimboloAmbiente : ambiente -> id -> valor
 
     (* estado *)
+    val estadoInicial : estado
     val obterAmbiente : estado -> ambiente
     val atualizarAmbiente : estado -> ambiente -> estado
     val obterResultado : estado -> valor
@@ -77,7 +78,7 @@ signature DOMINIO =
 (* implementacao do dominio *)
 structure Dominio :> DOMINIO =
   struct
-    datatype nomeestado = 
+    datatype nomeestado =
         Inicializado
       | Executando
       | Finalizado
@@ -101,10 +102,10 @@ structure Dominio :> DOMINIO =
       | VComando of comando
       | VProcesso of processo
 
-    and grupoprocessos = 
+    and grupoprocessos =
         GrupoProcessos of (processo * nomeestado) list
 
-    and dependencias = 
+    and dependencias =
         Dependencias of (processo * processo) list
 
     and filaeventos =
@@ -115,13 +116,13 @@ structure Dominio :> DOMINIO =
  
     and estado =
         Estado of {
-          resultado      : valor,
-          ambiente       : ambiente,
-          dependencias   : dependencias,
-          eventos        : filaeventos,
+          resultado : valor,
+          ambiente : ambiente,
+          dependencias : dependencias,
+          eventos : filaeventos,
           eventosUsuario : filaevusuario,
-          processos      : grupoprocessos,
-          mensagens      : string list
+          processos : grupoprocessos,
+          mensagens : string list
         }
 
     withtype comando = int * (int -> estado -> (estado * estado) -> estado)
@@ -132,6 +133,7 @@ structure Dominio :> DOMINIO =
     val executando = Executando
     val suspenso = Suspenso
     val finalizado = Finalizado
+
 
     (* processo *)
     fun novoProcesso nome pid =
@@ -163,14 +165,14 @@ structure Dominio :> DOMINIO =
       let
         fun isNotDep (dt, dy) =
           (notEquals dt dependent) orelse (notEquals dy dependency)
-        val l2 = List.filter isNotDep l 
-      in 
+        val l2 = List.filter isNotDep l
+      in
         Dependencias l2
       end
 
     (* filaeventos *)
-    val filaEventosVazia  = FilaEventos []
-    fun criarEscutadorEvento filaeventos processo nomeestado comando = 
+    val filaEventosVazia = FilaEventos []
+    fun criarEscutadorEvento filaeventos processo nomeestado comando =
       let
         val (FilaEventos l) =
           removerEscutadorEvento filaeventos processo nomeestado
@@ -212,20 +214,29 @@ structure Dominio :> DOMINIO =
     val ambienteInicial = AmbienteVazio
     fun extenderAmbiente ambiente id valor =
       Ambiente ((id, valor), ambiente)
-    fun obterSimboloAmbiente AmbienteVazio id = 
+    fun obterSimboloAmbiente AmbienteVazio id =
           raise (NaoEncontrado id)
       | obterSimboloAmbiente (Ambiente ((eid, v), next)) tid =
           if eid = tid then v else (obterSimboloAmbiente next tid)
 
     (* estado *)
+    val estadoInicial = Estado ({
+          resultado = VNomeEstado(Inicializado),
+          ambiente = ambienteInicial,
+          dependencias = dependenciasVazia,
+          eventos = filaEventosVazia,
+          eventosUsuario = filaEvUsuarioVazia,
+          processos = grupoProcessoVazio,
+          mensagens = []
+    })
     fun obterAmbiente (Estado s) =
       #ambiente s
     fun atualizarAmbiente (Estado s) ambiente =
       let
         val ({
           resultado=rs,
-          ambiente=_, 
-          dependencias=deps, 
+          ambiente=_,
+          dependencias=deps,
           eventos=evs,
           eventosUsuario=evus,
           processos=ps, mensagens=msgs
@@ -246,8 +257,8 @@ structure Dominio :> DOMINIO =
       let
         val ({
           resultado=_,
-          ambiente=ambiente, 
-          dependencias=deps, 
+          ambiente=ambiente,
+          dependencias=deps,
           eventos=evs,
           eventosUsuario=evus,
           processos=ps, mensagens=msgs
@@ -262,14 +273,14 @@ structure Dominio :> DOMINIO =
           processos=ps,
           mensagens=msgs
         }
-      end      
+      end
     fun obterDependencias (Estado s) = #dependencias s
     fun atualizarDependencias (Estado s) dependencias =
       let
         val ({
           resultado=rs,
-          ambiente=ambiente, 
-          dependencias=_, 
+          ambiente=ambiente,
+          dependencias=_,
           eventos=evs,
           eventosUsuario=evus,
           processos=ps, mensagens=msgs
@@ -290,8 +301,8 @@ structure Dominio :> DOMINIO =
       let
         val ({
           resultado=rs,
-          ambiente=ambiente, 
-          dependencias=deps, 
+          ambiente=ambiente,
+          dependencias=deps,
           eventos=_,
           eventosUsuario=evus,
           processos=ps, mensagens=msgs
@@ -307,13 +318,13 @@ structure Dominio :> DOMINIO =
           mensagens=msgs
         }
       end
-    fun obterEventosUsuario (Estado s) = #eventosUsuario s 
+    fun obterEventosUsuario (Estado s) = #eventosUsuario s
     fun atualizarEventosUsuario (Estado s) evus =
       let
         val ({
           resultado=rs,
-          ambiente=ambiente, 
-          dependencias=deps, 
+          ambiente=ambiente,
+          dependencias=deps,
           eventos=evs,
           eventosUsuario=_,
           processos=ps, mensagens=msgs
@@ -329,16 +340,16 @@ structure Dominio :> DOMINIO =
           mensagens=msgs
         }
       end
-    fun obterGrupoProcessos (Estado s) = #processos s 
+    fun obterGrupoProcessos (Estado s) = #processos s
     fun atualizarGrupoProcessos (Estado s) grupoprocessos =
       let
         val ({
           resultado=rs,
-          ambiente=ambiente, 
-          dependencias=deps, 
+          ambiente=ambiente,
+          dependencias=deps,
           eventos=evs,
           eventosUsuario=evus,
-          processos=_, 
+          processos=_,
           mensagens=msgs
         }) = s
       in
@@ -351,16 +362,16 @@ structure Dominio :> DOMINIO =
           processos=grupoprocessos,
           mensagens=msgs
         }
-      end      
+      end
     fun registrar (Estado s) string =
       let
         val ({
           resultado=rs,
-          ambiente=ambiente, 
-          dependencias=deps, 
+          ambiente=ambiente,
+          dependencias=deps,
           eventos=evs,
           eventosUsuario=evus,
-          processos=ps, 
+          processos=ps,
           mensagens=msgs
         }) = s
       in
@@ -373,6 +384,9 @@ structure Dominio :> DOMINIO =
           processos=ps,
           mensagens=(string :: msgs)
         }
-      end      
+      end
 
   end
+
+
+
