@@ -47,50 +47,59 @@ print "\n\tTestando Funcoes de Processo:\n\n";
 val processoX : Dominio.processo = Dominio.novoProcesso "processoX" 3;
 val gpro  : Dominio.grupoprocessos = Dominio.grupoProcessoVazio;
 val gpro2  : Dominio.grupoprocessos = Dominio.alterarProcessoGrupo gpro processoX Dominio.inicializado;
-val processoSubOrquestador : Dominio.processo = 
-  Dominio.novoSubOrquestrador comdVazio 7;
-(*
-val funcao
-    (* grupo processos *)
+val processoSubOrquestador : Dominio.processo = Dominio.novoSubOrquestrador comdVazio 7;
 
-
- 
-
-
-(*  *)
-    (* processo *)
-
-
+    (* processo
+    val novoProcesso : string -> int -> processo
+    val novoSubOrquestrador : comando -> int -> processo
+    val alterarProcessoGrupo : grupoprocessos -> processo -> nomeestado -> grupoprocessos
+    val grupoProcessoVazio : grupoprocessos
+    *)
 
 print "\n\tTestando Funcoes de Dependencia:\n\n";
 
-    (* dependencias *)
+val dependencias : Dominio.dependencias = Dominio.dependenciasVazia;
+val dependenciasAtualizadas : Dominio.dependencias = Dominio.criarDependencia dependencias processoX processoSubOrquestador;
+val dependenciasAtualizadas : Dominio.dependencias = Dominio.removerDependencia dependencias processoX processoSubOrquestador;
+
+    (* dependencias 
     val dependenciasVazia : dependencias
     val criarDependencia : dependencias -> processo -> processo -> dependencias
     val removerDependencia : dependencias -> processo -> processo -> dependencias
-
+    *)
 print "\n\tTestando Funcoes de Fila de Eventos:\n\n";
 
-    (* filaeventos *)
+val filaEventos : Dominio.filaeventos = Dominio.filaEventosVazia;
+val filaEventosAtualizada : Dominio.filaeventos = Dominio.criarEscutadorEvento filaEventos processoX Dominio.inicializado comdVazio;
+val filaEventosAtualizada : Dominio.filaeventos = Dominio.removerEscutadorEvento filaEventos processoX Dominio.inicializado;
+
+    (* filaeventos 
     val filaEventosVazia : filaeventos
     val criarEscutadorEvento : filaeventos -> processo -> nomeestado -> comando -> filaeventos
     val removerEscutadorEvento : filaeventos -> processo -> nomeestado -> filaeventos
-
+    *)
 print "\n\tTestando Funcoes de Fila de Usuarios:\n\n";
 
-    (* filaevusuario *)
+val filaEventosUsuario : Dominio.filaevusuario = Dominio.filaEvUsuarioVazia;
+val filaEventosAtualizada : Dominio.filaevusuario = Dominio.criaEscutadorEvUsuario filaEventosUsuario processoX "teste" comdVazio;
+val filaEventosAtualizada : Dominio.filaevusuario = Dominio.removerEscutadorEvUsuario filaEventosUsuario processoX "teste";
+
+    (* filaevusuario 
     val filaEvUsuarioVazia : filaevusuario
     val criaEscutadorEvUsuario : filaevusuario -> processo -> string -> comando -> filaevusuario
     val removerEscutadorEvUsuario : filaevusuario -> processo -> string -> filaevusuario
-
+    *)
 print "\n\tTestando Funcoes de Ambiente:\n\n";
 
-    (* ambiente *)
-    exception NaoEncontrado of id
+val ambiente : Dominio.ambiente = Dominio.ambienteInicial;
+val ambiente : Dominio.ambiente  = Dominio.extenderAmbiente ambiente (Dominio.Id("id")) (Dominio.VCadeia("valor"));
+val valorObtido : Dominio.valor = Dominio.obterSimboloAmbiente ambiente (Dominio.Id("id"));
+
+    (* ambiente 
     val ambienteInicial : ambiente
     val extenderAmbiente : ambiente -> id -> valor -> ambiente
     val obterSimboloAmbiente : ambiente -> id -> valor
-
+    *)
 print "\n\tTestando Funcoes de Estado :\n\n";
 
 val estadoInicial = (Dominio.estadoInicial);
@@ -98,10 +107,13 @@ print "\n";
 val ambienteObtido = Dominio.obterAmbiente( estadoInicial );
 val funcAtualizaAmbiente = Dominio.atualizarAmbiente (estadoInicial);
 val estadoAtualizado = funcAtualizaAmbiente(ambienteObtido);
+val estadoAtualizado = Dominio.atualizarAmbiente estadoInicial ambienteObtido;
+
 print "\n";
 val resultadoObtido = Dominio.obterResultado(estadoAtualizado);
 val funcAtualizaResultado = Dominio.atualizarResultado (estadoInicial);
 val estadoAtualizado = funcAtualizaResultado(Dominio.VCadeia("resultado"));
+val estadoAtualizado = Dominio.atualizarResultado estadoInicial (Dominio.VCadeia("resultado"));
 val resultadoObtido = Dominio.obterResultado(estadoAtualizado);
 print "\n";
 val dependenciasObtidas = Dominio.obterDependencias(estadoAtualizado);
@@ -122,25 +134,8 @@ val estadoAtualizado = funcAtualizaGrupoProcessos(grupoProcessosObtidos);
 print "\n";
 val funcAtualizaRegistros = Dominio.registrar(estadoAtualizado);
 val estadoAtualizado = funcAtualizaRegistros("teste");
-print estadoAtualizado.mensagens;
 print "\n";
 
-    (*Marcio : estado *)
-    val obterAmbiente : estado -> ambiente
-    val atualizarAmbiente : estado -> ambiente -> estado
-    val obterResultado : estado -> valor
-    val atualizarResultado : estado -> valor -> estado
-    val obterDependencias : estado -> dependencias
-    val atualizarDependencias : estado -> dependencias -> estado
-    val obterEventos : estado -> filaeventos
-    val atualizarEventos : estado -> filaeventos -> estado
-    val obterEventosUsuario : estado -> filaevusuario
-    val atualizarEventosUsuario : estado -> filaevusuario -> estado
-    val obterGrupoProcessos : estado -> grupoprocessos
-    val atualizarGrupoProcessos : estado -> grupoprocessos -> estado
-    val registrar : estado -> string -> estado
-
-*)
 
 (*
 print "\n\tBrincando com DataTypes:\n\n";
