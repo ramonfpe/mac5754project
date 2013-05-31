@@ -18,11 +18,11 @@
 	|SUB_DEF 
 	|LIST_PARAM_DEF
 	|BLOCO
-	|LIST_CMD
+	|LIST_CMD	
 	|CMD 
 	|CALL of Dominio.valor
-	|LIST_EXPR of Dominio.estado -> (int * Dominio.estado * (Dominio.valor list))
-	|EXPR of Dominio.estado -> Dominio.estado
+	|LIST_EXPR 
+	|EXPR of Dominio.valor
 
 %name Maestro
 
@@ -55,18 +55,14 @@
 
   CALL	:ID LIST_EXPR SEMI (Dominio.VNomeEstado Dominio.inicializado) (*TO DO*)
 
-  LIST_EXPR : EXPR LIST_EXPR	(fn e =>
-				    let val (i, e2, l) = LIST_EXPR e
-					val e3 = EXPR e2
-				    in  (i+1, e3, ((Dominio.obterResultado e3)::l))
-				 end)  
-	| 			(fn e => (0, e, []) )
+  LIST_EXPR : EXPR LIST_EXPR	(print "LIST_EXPR \n")
+	| 			(print "LIST_EXPR VAZIO \n")
 
-  EXPR	: EST_INI  (fn e => Dominio.atualizarResultado e (Dominio.VNomeEstado Dominio.inicializado))
-	| EST_SUS  (fn e => Dominio.atualizarResultado e (Dominio.VNomeEstado Dominio.suspenso))
-	| EST_EXE  (fn e => Dominio.atualizarResultado e (Dominio.VNomeEstado Dominio.executando))
-	| EST_FIN  (fn e => Dominio.atualizarResultado e (Dominio.VNomeEstado Dominio.finalizado))
-	| CADEIA   (fn e => Dominio.atualizarResultado e (Dominio.VCadeia CADEIA))
-	| COLCH_E CALL COLCH_D (fn e => Dominio.atualizarResultado e CALL)
-	| BOOL_V   (fn e => Dominio.atualizarResultado e (Dominio.VBooleano true))
-	| BOOL_F   (fn e => Dominio.atualizarResultado e (Dominio.VBooleano false))
+  EXPR	: EST_INI  (Dominio.VNomeEstado Dominio.inicializado)
+	| EST_SUS  (Dominio.VNomeEstado Dominio.suspenso)
+	| EST_EXE  (Dominio.VNomeEstado Dominio.executando)
+	| EST_FIN  (Dominio.VNomeEstado Dominio.finalizado)
+	| CADEIA   (Dominio.VCadeia CADEIA)
+	| COLCH_E CALL COLCH_D (CALL)
+	| BOOL_V   (Dominio.VBooleano true)
+	| BOOL_F   (Dominio.VBooleano false)
