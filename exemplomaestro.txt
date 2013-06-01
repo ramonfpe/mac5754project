@@ -1,0 +1,48 @@
+$db   := programa "/usr/bin/db"
+$srv1 := programa "/usr/bin/srv1"
+$app1 := programa "/usr/bin/app1"
+$srv2 := programa "/usr/bin/srv2"
+$app2 := programa "/usr/bin/app2"
+
+$p_db   := processo $db
+$p_srv1 := processo $srv1
+$p_app1 := processo $app1
+$p_srv2 := processo $srv2
+$p_app2 := processo $app2
+
+dependencia $p_app1 $p_db
+dependencia $p_app1 $p_srv1
+dependencia $p_app2 $p_db
+dependencia $p_app2 $p_srv2
+dependencia $p_app2 $p_app1
+
+quando $p_app2 "finalizado" ressuscitar
+usuario $p_app2 "natal" natal
+
+sub natal {
+  $p_temp := suborquestrador balanceador
+  usuario $p_temp "normal" normal
+  trocar $p_temp $p_app2
+  finalizar $p_temp
+}
+
+sub normal {
+  $p_temp := processo $app2
+  usuario $p_temp "natal" natal
+  trocar $p_temp $p_app2
+  finalizar $temp
+}
+
+sub balanceador {
+  repetir "5" criar_app2
+}
+
+sub criar_app2 {
+  $p_temp := processo $app2
+  quando $p_app2 "finalizado" ressuscitar
+}
+
+sub ressuscitar $p {
+  registrar "morte inesperada de processo"
+  reiniciar $p
+}
