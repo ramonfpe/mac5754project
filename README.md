@@ -32,6 +32,35 @@ Organização do fonte
 * *maestro.sml*
 * *posix-proc-manager.sml*
 
+Sintaxe da linguagem maestro (EBNF)
+-----------------------------------
+
+    maestro = { sub } .
+    
+    sub = "sub” ID “(” [ ID {“,” ID } ] “)” bloco .
+    
+    cmd = “se” expr bloco
+        | “repetir” NUM bloco
+        | [ ID “=” ] ID { expr } ";"
+        | “retornar” expr ";" .
+        
+    expr = ID
+         | “@” (“inicializado”|“suspenso”|“executando”|“finalizado”)
+         | CADEIA
+         | “[” ID { expr } “]”
+         | (“verdadeiro”|“falso”) .
+         
+    bloco = “{” { cmd } “}” .
+
+
+Comandos pré-definidos
+----------------------
+
+* `registar <cadeia>`
+* `processo <cadeia>`
+* `quando <processo> <estado> <comando-callback>`
+* `dependencia <processo-dependente> <processo-dependencia>`
+* `suborquestrador <comando>`
 
 Carregando no sml
 -----------------
