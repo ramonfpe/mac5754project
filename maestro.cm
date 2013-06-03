@@ -1,0 +1,13 @@
+Group is
+  $/basis.cm
+  $/smlnj-lib.cm
+  parser.sig
+  lexer.sig
+  semantic.sig
+  proc-manager.sig
+  make-parser.fun
+  make-semantic.fun
+  debug-semantic.sml
+  lexer.sml
+  posix-proc-manager.sml
+  maestro.sml
