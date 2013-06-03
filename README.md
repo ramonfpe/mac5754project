@@ -1,12 +1,40 @@
 maestro
 =======
 
-#### Dependências:
+Dependências
+------------
 
 * **SML/NJ** >= 110.75
 * **Linux** >= 2.6.x
 
-#### Carregando no sml
+Organização do fonte
+--------------------
+
+#### Arquivos de build
+
+* *maestro.cm*
+
+#### Interfaces
+
+* *lexer.sig*
+* *parser.sig*
+* *proc-manager.sig*
+* *semantic.sig*
+
+#### Functors
+
+* *make-parser.fun*
+* *make-semantic.fun*
+
+#### Implementações
+
+* *lexer.sml*
+* *maestro.sml*
+* *posix-proc-manager.sml*
+
+
+Carregando no sml
+-----------------
 
 Para carregar o maestro no SML basta carregar o arquivo "maestro.cm" utilizando o *CompilationManager*
 
@@ -35,21 +63,25 @@ Para carregar o maestro no SML basta carregar o arquivo "maestro.cm" utilizando 
     val it = true : bool
     -
 
-#### Construção de imagem
+Construção de imagem
+--------------------
 
     ml-build maestro.cm Maestro.main maestro
 
-#### Execução da imagem
+Execução da imagem
+------------------
 
     sml @SMLload=maestro.arquitetura+os
     
 Obs: Substituir **arquitetura+os** pela arquitetura onde foi construída a imagem.
 
-#### Arquivo binário para distribuição
+Arquivo binário para distribuição
+---------------------------------
 
     heap2exec maestro.arquitetura+os maestro
 
-#### Execução
+Execução
+--------
 
     $ ./maestro
     usage:
@@ -57,7 +89,8 @@ Obs: Substituir **arquitetura+os** pela arquitetura onde foi construída a image
         maestro <source>
     
 
-#### Exemplo
+Exemplo
+-------
 
 Arquivo *teste.maestro* :
 
