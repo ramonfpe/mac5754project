@@ -55,5 +55,25 @@ Obs: Substituir **arquitetura+os** pela arquitetura onde foi construída a image
     usage:
         
         maestro <source>
+    
 
+#### Exemplo
 
+Arquivo *teste.maestro* :
+
+    sub main() {
+      p = processo "ls -la";
+      quando p @finalizado morreu;
+    }
+    
+    sub morreu(processo, status) {
+      registrar "p morreu !";
+    }
+
+Para executar:
+
+    $ ./maestro teste.maestro
+
+CTRL+C para encerrar o maestro.
+Obs: O processo executará sem stdin, stdout e stderr. Espera-se que os processos sejam *daemons* embora o exemplo acima
+utilize os clássico *ls*.
