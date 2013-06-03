@@ -1,4 +1,15 @@
 (*
+ * Maestro: orquestrador de processos
+ * Licença: LGPL 2.0
+ * Autores: 
+ *   Fabio Alexandre Campos Tisovec
+ *   Jorge Augusto Sabaliauskas
+ *   Márcio Fernando Stabile Junior
+ *   Ramon Fortes Pereira
+ *)
+
+
+(*
  * nosso gerenciador de processos no Unix
  * Obs: W_IFCONTINUED, enviado ao processo pai na continuacao
  * de um processo filho nao esta presente em todos os UNIXes

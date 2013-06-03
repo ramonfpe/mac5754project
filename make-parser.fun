@@ -1,3 +1,12 @@
+(*
+ * Maestro: orquestrador de processos
+ * Licença: LGPL 2.0
+ * Autores: 
+ *   Fabio Alexandre Campos Tisovec
+ *   Jorge Augusto Sabaliauskas
+ *   Márcio Fernando Stabile Junior
+ *   Ramon Fortes Pereira
+ *)
 functor MakeParser(Semantic:SEMANTIC) : PARSER =
   struct
     type result = Semantic.maestro
@@ -45,7 +54,7 @@ functor MakeParser(Semantic:SEMANTIC) : PARSER =
           in
             Semantic.maestro subs
           end
-        (* sub” ID “(” [ ID {“,” ID } ] “)” bloco. *)
+        (* sub = "sub” ID “(” [ ID {“,” ID } ] “)” bloco. *)
         and sub () =
           let
             val _   = consume Lexer.Sub

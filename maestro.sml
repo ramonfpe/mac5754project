@@ -1,3 +1,12 @@
+(*
+ * Maestro: orquestrador de processos
+ * Licença: LGPL 2.0
+ * Autores: 
+ *   Fabio Alexandre Campos Tisovec
+ *   Jorge Augusto Sabaliauskas
+ *   Márcio Fernando Stabile Junior
+ *   Ramon Fortes Pereira
+ *)
 structure Maestro =
   struct
     structure PosixSemantic = MakeSemantic(PosixProcManager)

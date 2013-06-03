@@ -1,3 +1,13 @@
+(*
+ * Maestro: orquestrador de processos
+ * Licença: LGPL 2.0
+ * Autores: 
+ *   Fabio Alexandre Campos Tisovec
+ *   Jorge Augusto Sabaliauskas
+ *   Márcio Fernando Stabile Junior
+ *   Ramon Fortes Pereira
+ *)
+
 signature LEXER =
   sig
     type lexer
