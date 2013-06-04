@@ -130,6 +130,24 @@ functor MakeSemantic(PM : PROC_MANAGER) : SEMANTIC =
         evalExprs estado exprs []
       end
 
+    (* de um valor booleano para seu valor negado *)
+    fun boolNao (estado:estado) (ValBooleano b::[]) = 
+        updateResult estado (ValBooleano (not b))
+      | boolNao _ _ =
+          raise RuntimeError "parametros incorretos para a funcao Nao"
+
+    (* de dois valores booleanos para um valor booleano *)
+    fun boolE (estado:estado) (ValBooleano b1::(ValBooleano b2::[])) = 
+        updateResult estado (ValBooleano (b1 andalso b2))
+      | boolE _ _ =
+          raise RuntimeError "parametros incorretos para a funcao E"
+
+    (* de dois valores booleanos para um valor booleano *)
+    fun boolOu (estado:estado) (ValBooleano b1::(ValBooleano b2::[])) = 
+        updateResult estado (ValBooleano (b1 orelse b2))
+      | boolOu _ _ =
+          raise RuntimeError "parametros incorretos para a funcao Ou"
+
     (* procura por um callback para um processo + status *)
     fun getListenerCmdRef listeners (pid:PM.pid) (status:PM.status) : comando ref option =
       let
@@ -272,6 +290,9 @@ functor MakeSemantic(PM : PROC_MANAGER) : SEMANTIC =
           ("processo", processo),
           ("quando", quando),
           ("dependencia", dependencia),
+          ("nao", boolNao),
+          ("e", boolE),
+          ("ou", boolOu),
           ("suborquestrador", suborquestrador)
         ]
         val env = ref [builtinCtx]
