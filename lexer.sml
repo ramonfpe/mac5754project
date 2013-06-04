@@ -139,13 +139,13 @@ structure Lexer :> LEXER =
         (* Leitura de palavra chave ou identificador *)
         and keywordOrId clist =
           case (readWord clist) of
-            "sub"      => {tokentype=Sub, text=""}
-          | "se"       => {tokentype=Se, text=""}
-          | "repetir"  => {tokentype=Repetir, text=""}
-          | "retornar" => {tokentype=Retornar, text=""}
-          | "true"     => {tokentype=Verdadeiro, text=""}
-          | "false"    => {tokentype=Falso, text=""}
-          |  s         => {tokentype=Id, text=s}
+            "sub"        => {tokentype=Sub, text=""}
+          | "se"         => {tokentype=Se, text=""}
+          | "repetir"    => {tokentype=Repetir, text=""}
+          | "retornar"   => {tokentype=Retornar, text=""}
+          | "verdadeiro" => {tokentype=Verdadeiro, text=""}
+          | "falso"      => {tokentype=Falso, text=""}
+          |  s           => {tokentype=Id, text=s}
         (* auxiliar: le uma palavra *)
         and readWord clist =
           let
