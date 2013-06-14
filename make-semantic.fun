@@ -70,7 +70,7 @@ functor MakeSemantic(PM : PROC_MANAGER) : SEMANTIC =
     fun lookupVal (env:environment) (id:string) : valor =
       let
         fun lookupVal []          =
-              raise RuntimeError ("nome " ^ id ^ "desconhecido")
+              raise RuntimeError ("nome " ^ id ^ " desconhecido")
           | lookupVal (ctx::ctxs) =
               case lookupCtx ctx id of
                 SOME cell => !cell
