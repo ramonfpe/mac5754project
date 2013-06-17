@@ -1,0 +1,48 @@
+sub main() {
+  p = processo "sh exec.sh";
+  nome = nomear;
+  se verdadeiro {
+    registrar "condicao verdadeira";
+  }
+  se falso {
+    registrar "condicao falsa";
+  }
+  repetir 2{
+    c = processo "ls";
+    registrar nome;
+  }
+
+  se verdadeiro {
+    comando = atribui "sh exec.sh";
+  }
+  se falso {
+    comando = atribui "sh exec2.sh";
+  }
+  proc = processo [atribui [atribui comando]];
+  
+  quando c @finalizado morrec;
+  quando c @inicializado iniciar;
+  quando p @finalizado morrep;
+
+}
+
+sub morrep(processo, status) {
+  registrar "p morreu !";
+  
+}
+
+sub iniciar(processo, status) {
+  registrar "c iniciado !";
+}
+
+sub morrec(processo, status) {
+  registrar "c morreu !";
+}
+
+sub nomear(){
+  retornar "nome";
+}
+
+sub atribui (a){
+  retornar a;
+}
