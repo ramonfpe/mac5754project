@@ -6,7 +6,7 @@ Maestro
 * Instruções para execução:
   README.md na raiz do projeto.
 
-* Limitações: 
+* Observações: 
 
  1) SML
   As rotinas para interface com o sistema operacional Unix (módulos Posix 
@@ -32,4 +32,11 @@ Maestro
   - e <bool> <bool>
   - ou <bool> <bool>
   - suborquestrador <comando>
- 
+
+ 4) Semântica
+  O domínio semântico foi simplificado com a introdução de efeitos (referências
+  mutáveis) na implementação. Mesmo assim, a implementação está parecida com
+  a definida no domínio semântico.
+
+ 5) Exemplos
+  A pasta exemplos contém alguns pequenos exemplos de uso da linguagem Maestro.

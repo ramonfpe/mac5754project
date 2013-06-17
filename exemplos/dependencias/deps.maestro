@@ -1,0 +1,15 @@
+sub main() {
+  p = processo "python p.py";
+  q = processo "python q.py";
+  dependencia q p;
+  quando q @finalizado qmorreu;
+  quando p @finalizado pmorreu;
+}
+
+sub qmorreu(p, s) {
+  registrar "q morreu";
+}
+
+sub pmorreu(p, s) {
+  registrar "p morreu";
+}

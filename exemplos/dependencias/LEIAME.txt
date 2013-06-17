@@ -1,0 +1,8 @@
+Obs:
+  1) execute o maestro OBRIGATORIAMENTE nesse diretório
+    sml @SMLload=../../maestro.x86-darwin deps.maestro
+  2) através do gerenciador de processos, mate o processo
+      "python p.py"
+     no terminal deverá aparecer:
+       p morreu
+       q morreu

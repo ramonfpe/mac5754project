@@ -1,0 +1,8 @@
+sub main() {
+  p = processo "ls -la";
+  quando p @finalizado fim;
+}
+
+sub fim(processo, status) {
+  registrar "ls terminou";
+}
