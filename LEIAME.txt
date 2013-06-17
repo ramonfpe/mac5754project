@@ -1,0 +1,35 @@
+Maestro
+
+* Repositório oficial:
+  https://github.com/ramonfpe/mac5754project
+
+* Instruções para execução:
+  README.md na raiz do projeto.
+
+* Limitações: 
+
+ 1) SML
+  As rotinas para interface com o sistema operacional Unix (módulos Posix 
+  e Unix) disponíveis no SML não foram suficientes para implementar todos
+  os recursos planejados inicialmente na linguagem. Poderão surgir processos
+  orfãos (sem pai, adotado pelo processo init) ao se utilizar suborquestradores
+  e o evento de continuação de processo não é disparado (apenas no Linux é
+  possível capturar esse evento). Uma saída seria a utilização de chamadas
+  para funções externas como "prctl" e "waitpid".
+
+ 2) Implementação
+  Eventos de usuário não foram implementados por necessitarem de uma interface
+  específica de interação com o usuário. Aqui seria necessário novamente
+  chamadas a funções externas.
+
+ 3) Comandos implementados
+  Os seguintes comandos foram implementados:
+  - registrar <msg-cadeia>
+  - processo <nome-do-processo-cadeia>
+  - quando <processo> <estado> <comando>
+  - dependencia <dependente-processo> <dependencia-processo>
+  - nao <bool>
+  - e <bool> <bool>
+  - ou <bool> <bool>
+  - suborquestrador <comando>
+ 
